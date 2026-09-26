@@ -33,3 +33,7 @@ npx expo run:android --no-bundler
 ## License
 
 MIT License. See [LICENSE](LICENSE).
+
+## App
+
+Local Prompt lets users enter a prompt and receive an AI response generated locally on the Android device.
