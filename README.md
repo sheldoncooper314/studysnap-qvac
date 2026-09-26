@@ -1,16 +1,22 @@
 # Local Prompt
 
-A small Android app that runs AI inference locally on-device using the Tether QVAC SDK.
+Local Prompt is a small Android app demonstrating on-device AI inference with the Tether QVAC SDK.
 
 ## Features
 
-- Local AI inference on Android
-- Simple prompt interface
-- Powered by Tether QVAC SDK
+- AI inference runs directly on Android
+- QVAC `loadModel` loads the local Llama model
+- QVAC `completion` generates responses on-device
+- Streaming response display
+- Original prompt presets for quick experiments
+- Concise preset prompts for a responsive mobile experience
 
 ## QVAC SDK
 
-- `@qvac/sdk` version `0.20.0`
+- Package: `@qvac/sdk`
+- Version: `0.20.0`
+
+The QVAC Llama.cpp completion plugin is configured in `qvac.config.json`.
 
 ## Install
 
@@ -30,10 +36,17 @@ For the native Android build:
 npx expo run:android --no-bundler
 ```
 
+The first run downloads the local AI model.
+
+## How it works
+
+1. QVAC `loadModel` loads the local model.
+2. The user enters a prompt or selects a preset.
+3. QVAC `completion` generates the response.
+4. The response is displayed in the Android app.
+
+AI generation runs locally on the device.
+
 ## License
 
 MIT License. See [LICENSE](LICENSE).
-
-## App
-
-Local Prompt lets users enter a prompt and receive an AI response generated locally on the Android device.
