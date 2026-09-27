@@ -1,15 +1,16 @@
-# Local Prompt
+# StudySnap
 
-Local Prompt is a small Android app demonstrating on-device AI inference with the Tether QVAC SDK.
+StudySnap is a small Android study companion that uses the Tether QVAC SDK to generate concise study guides directly on the device.
 
 ## Features
 
-- AI inference runs directly on Android
-- QVAC `loadModel` loads the local Llama model
-- QVAC `completion` generates responses on-device
-- Streaming response display
-- Original prompt presets for quick experiments
-- Concise preset prompts for a responsive mobile experience
+- On-device AI inference
+- Topic-based study guides
+- Short summaries and key points
+- Quick-check question for review
+- Streaming AI output
+- Scrollable study results for mobile screens
+- No cloud inference required
 
 ## QVAC SDK
 
@@ -40,12 +41,12 @@ The first run downloads the local AI model.
 
 ## How it works
 
-1. QVAC `loadModel` loads the local model.
-2. The user enters a prompt or selects a preset.
-3. QVAC `completion` generates the response.
-4. The response is displayed in the Android app.
+1. QVAC `loadModel` loads the local Llama model.
+2. The student enters a study topic or selects a subject shortcut.
+3. QVAC `completion` generates a concise study guide locally.
+4. StudySnap streams the result into a scrollable study-guide panel.
 
-AI generation runs locally on the device.
+All AI generation runs on-device.
 
 ## License
 

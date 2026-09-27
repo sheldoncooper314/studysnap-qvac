@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -19,7 +20,7 @@ import {
 export default function App() {
   const [modelId, setModelId] = useState<string | null>(null);
   const [status, setStatus] = useState("Loading local AI model...");
-  const [prompt, setPrompt] = useState("");
+  const [topic, setTopic] = useState("");
   const [response, setResponse] = useState("");
   const [running, setRunning] = useState(false);
 
@@ -31,9 +32,9 @@ export default function App() {
       try {
         const id = await loadModel({
           modelSrc: LLAMA_3_2_1B_INST_Q4_0,
-          onProgress: (progress) => {
+          onProgress: () => {
             if (!cancelled) {
-              setStatus("Downloading model...");
+              setStatus("Downloading study model...");
             }
           },
         });
@@ -42,7 +43,7 @@ export default function App() {
 
         if (!cancelled) {
           setModelId(id);
-          setStatus("Local AI ready");
+          setStatus("StudySnap ready");
         }
       } catch (error) {
         console.error(error);
@@ -63,14 +64,31 @@ export default function App() {
     };
   }, []);
 
-  async function runPrompt() {
-    if (!modelId || !prompt.trim() || running) {
+  async function createStudySnap() {
+    if (!modelId || !topic.trim() || running) {
       return;
     }
 
     setRunning(true);
     setResponse("");
-    setStatus("Thinking locally...");
+    setStatus("Creating study notes locally...");
+
+    const studyPrompt = `You are StudySnap, a concise study companion.
+
+Create a useful study guide for this topic: "${topic.trim()}"
+
+Use exactly this structure:
+
+SUMMARY:
+Give a simple 2-3 sentence explanation.
+
+KEY POINTS:
+Give 3 short bullet points.
+
+QUICK CHECK:
+Give 1 short question the student can answer to test understanding.
+
+Keep the language clear and beginner-friendly. Maximum 120 words. Do not add any text outside the three sections.`;
 
     try {
       const result = completion({
@@ -78,7 +96,7 @@ export default function App() {
         history: [
           {
             role: "user",
-            content: prompt.trim(),
+            content: studyPrompt,
           },
         ],
         stream: true,
@@ -91,24 +109,30 @@ export default function App() {
         setResponse(text);
       }
 
-      setStatus("Local AI ready");
+      setStatus("StudySnap ready");
     } catch (error) {
       console.error(error);
-      setResponse("Something went wrong while running the local model.");
-      setStatus("Local AI error");
+      setResponse("Something went wrong while creating the study guide.");
+      setStatus("StudySnap error");
     } finally {
       setRunning(false);
     }
   }
 
+  function chooseTopic(value: string) {
+    setTopic(value);
+    setResponse("");
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Local Prompt</Text>
+        <Text style={styles.title}>StudySnap</Text>
+
         <Text style={styles.qvacBadge}>Powered by Tether QVAC</Text>
 
         <Text style={styles.subtitle}>
-          On-device AI powered by Tether QVAC
+          Your private study companion, running AI locally on Android.
         </Text>
 
         <View style={styles.statusBox}>
@@ -116,34 +140,66 @@ export default function App() {
           <Text style={styles.status}>{status}</Text>
         </View>
 
+        <Text style={styles.sectionTitle}>What are you studying?</Text>
+
         <TextInput
           style={styles.input}
-          placeholder="Ask something..."
+          placeholder="e.g. Photosynthesis"
           placeholderTextColor="#777"
-          value={prompt}
-          onChangeText={setPrompt}
-          multiline
+          value={topic}
+          onChangeText={setTopic}
           editable={!running}
+          multiline
         />
+
+        <View style={styles.topicRow}>
+          <TouchableOpacity
+            style={styles.topicButton}
+            onPress={() => chooseTopic("Photosynthesis")}
+            disabled={running}
+          >
+            <Text style={styles.topicButtonText}>Biology</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.topicButton}
+            onPress={() => chooseTopic("The solar system")}
+            disabled={running}
+          >
+            <Text style={styles.topicButtonText}>Science</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.topicButton}
+            onPress={() => chooseTopic("World War II")}
+            disabled={running}
+          >
+            <Text style={styles.topicButtonText}>History</Text>
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity
           style={[
             styles.button,
-            (!modelId || running || !prompt.trim()) && styles.buttonDisabled,
+            (!modelId || running || !topic.trim()) && styles.buttonDisabled,
           ]}
-          onPress={runPrompt}
-          disabled={!modelId || running || !prompt.trim()}
+          onPress={createStudySnap}
+          disabled={!modelId || running || !topic.trim()}
         >
           <Text style={styles.buttonText}>
-            {running ? "Thinking..." : "Run locally"}
+            {running ? "Creating study guide..." : "Create StudySnap"}
           </Text>
         </TouchableOpacity>
 
         <View style={styles.responseBox}>
-          <Text style={styles.responseLabel}>Response</Text>
-          <Text style={styles.response}>
-            {response || "Your local AI response will appear here."}
-          </Text>
+          <Text style={styles.responseLabel}>Study Guide</Text>
+
+          <ScrollView style={styles.responseScroll}>
+            <Text style={styles.response}>
+            {response ||
+              "Enter a topic to create a summary, key points, and a quick check question."}
+            </Text>
+          </ScrollView>
         </View>
       </View>
     </SafeAreaView>
@@ -161,45 +217,66 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
-    fontSize: 32,
-    fontWeight: "700",
-    marginBottom: 8,
+    fontSize: 36,
+    fontWeight: "800",
+    marginBottom: 4,
   },
   qvacBadge: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "700",
     marginBottom: 6,
   },
   subtitle: {
     fontSize: 16,
     color: "#555",
-    marginBottom: 24,
+    lineHeight: 23,
+    marginBottom: 20,
   },
   statusBox: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   status: {
     fontSize: 14,
     color: "#444",
   },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 10,
+  },
   input: {
-    minHeight: 120,
+    minHeight: 90,
     backgroundColor: "#fff",
-    borderRadius: 12,
+    borderRadius: 14,
     padding: 16,
-    fontSize: 16,
+    fontSize: 17,
     textAlignVertical: "top",
     borderWidth: 1,
     borderColor: "#ddd",
+  },
+  topicRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 10,
+  },
+  topicButton: {
+    backgroundColor: "#e5e5e5",
+    paddingVertical: 9,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+  },
+  topicButtonText: {
+    fontSize: 13,
+    fontWeight: "600",
   },
   button: {
     marginTop: 16,
     backgroundColor: "#111",
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 14,
     alignItems: "center",
   },
   buttonDisabled: {
@@ -208,19 +285,23 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
   },
   responseBox: {
-    marginTop: 24,
+    marginTop: 20,
     backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 16,
-    minHeight: 150,
+    borderRadius: 14,
+    padding: 18,
+    minHeight: 170,
+    maxHeight: 250,
   },
   responseLabel: {
-    fontSize: 14,
-    fontWeight: "700",
-    marginBottom: 8,
+    fontSize: 15,
+    fontWeight: "800",
+    marginBottom: 10,
+  },
+  responseScroll: {
+    maxHeight: 180,
   },
   response: {
     fontSize: 16,
@@ -228,6 +309,11 @@ const styles = StyleSheet.create({
     color: "#222",
   },
 });
+
+
+
+
+
 
 
 
