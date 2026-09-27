@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "qvac-android-ai",
-    "slug": "qvac-android-ai",
+    "name": "StudySnap",
+    "slug": "studysnap",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
