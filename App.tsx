@@ -105,9 +105,10 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>Local Prompt</Text>
+        <Text style={styles.qvacBadge}>Powered by Tether QVAC</Text>
 
         <Text style={styles.subtitle}>
-          AI inference running directly on this Android device
+          On-device AI powered by Tether QVAC
         </Text>
 
         <View style={styles.statusBox}>
@@ -163,6 +164,11 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "700",
     marginBottom: 8,
+  },
+  qvacBadge: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 6,
   },
   subtitle: {
     fontSize: 16,
@@ -222,6 +228,8 @@ const styles = StyleSheet.create({
     color: "#222",
   },
 });
+
+
 
 
 
